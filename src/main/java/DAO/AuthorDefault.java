@@ -8,14 +8,22 @@ import org.bson.types.ObjectId;
 import static com.mongodb.client.model.Filters.eq;
 
 
-import java.util.ArrayList;
+
 import java.util.List;
+import java.util.Vector;
 
 public class AuthorDefault implements AuthorDao{
     private MongoCollection<Document> collection;
 
     public AuthorDefault(MongoDatabase database) {
+
+        if (database.getCollection("authors") == null) {
+            System.out.println("Creating 'authors' collection...");
+            database.createCollection("authors");
+            System.out.println("'authors' collection created.");
+        }
         this.collection = database.getCollection("authors");
+
     }
 
     @Override
@@ -24,7 +32,7 @@ public class AuthorDefault implements AuthorDao{
                 .append("nationality", author.getNationality())
                 .append("birthYear", author.getBirthYear());
         if (author.getBookIds() != null) {
-            List<String> bookIds = new ArrayList<>();
+            List<String> bookIds = new Vector<>();
             for (ObjectId objectId : author.getBookIds()) {
                 bookIds.add(objectId.toHexString());
             }
@@ -44,16 +52,18 @@ public class AuthorDefault implements AuthorDao{
 
     @Override
     public List<Author> findAll() {
-        List<Author> authors = new ArrayList<>();
-        for (Document doc : collection.find()) {
-            authors.add(documentToAuthor(doc));
+        List<Author> authors = new Vector<>();
+
+        for (Document document : collection.find()) {
+
+            authors.add(documentToAuthor(document));
         }
         return authors;
     }
 
     @Override
     public List<Author> findAuthorsByNationality(String nationality) {
-        List<Author> authors = new ArrayList<>();
+        List<Author> authors = new Vector<>();
         for (Document doc : collection.find(eq("nationality", nationality))) {
             authors.add(documentToAuthor(doc));
         }
@@ -80,7 +90,7 @@ public class AuthorDefault implements AuthorDao{
         author.setNationality(doc.getString("nationality"));
         author.setBirthYear(doc.getInteger("birthYear", 0));
         // Convertir les String bookIds en ObjectId
-        List<ObjectId> bookIds = new ArrayList<>();
+        List<ObjectId> bookIds = new Vector<>();
         List<String> books = doc.getList("bookIds", String.class);
         if (books != null) {
             for (String bookId : books) {

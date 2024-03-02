@@ -22,6 +22,10 @@ class AuthorDefaultTest {
         database.getCollection("authors").drop();
 
         authorDao = new AuthorDefault(database);
+        Author author = new Author();
+        author.setName("Author test ");
+        author.setNationality("British");
+        author.setBirthYear(2000);
     }
 
     @Test
@@ -41,5 +45,16 @@ class AuthorDefaultTest {
         assertEquals(2000, author.getBirthYear());
     }
 
+    @Test
+    void testDeleteItem(){
 
+        assertNotNull( authorDao.findAuthorsByNationality("British"));
+        System.out.println( authorDao.findAuthorsByNationality("British"));
+    }
+
+   /* @AfterEach
+    void  clearData(){
+        database.getCollection("authors").drop();
+    }
+*/
 }

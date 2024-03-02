@@ -52,4 +52,16 @@ public class Author {
     public void setBookIds(List<ObjectId> bookIds) {
         this.bookIds = bookIds;
     }
+
+
+    @Override
+    public String toString() {
+        return "Author{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", nationality='" + nationality + '\'' +
+                ", birthYear=" + birthYear +
+                ", bookIds=" + bookIds +
+                '}';
+    }
 }

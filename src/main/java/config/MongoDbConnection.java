@@ -13,6 +13,7 @@ public class MongoDbConnection {
 
     public static MongoDatabase getDatabase() {
         if (databaseInstance == null) {
+            System.out.println(" CONEXION MONGODB........");
             MongoClient mongoClient = MongoClients.create(CONNECTION_URL);
             databaseInstance = mongoClient.getDatabase(DATABASE_NAME);
         }
