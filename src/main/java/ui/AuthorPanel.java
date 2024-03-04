@@ -1,7 +1,9 @@
 package ui;
 
 import actions.AuthorAction;
+import com.mongodb.client.MongoDatabase;
 import models.Author;
+import org.bson.types.ObjectId;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -20,6 +22,7 @@ public class AuthorPanel extends JPanel {
     private final JTable authorTable;
 
     private final AuthorAction authorAction;
+    private String selectedAuthorId;
 
     public AuthorPanel(AuthorAction authorAction) {
         this.authorAction = authorAction;
@@ -48,7 +51,7 @@ public class AuthorPanel extends JPanel {
         authorInputPanel.add(deleteAuthorButton);
 
         // Author Table
-        String[] authorColumnNames = {"Name", "Nationality", "Birth Year"};
+        String[] authorColumnNames = {"ID","Name", "Nationality", "Birth Year"};
         DefaultTableModel authorTableModel = new DefaultTableModel(authorColumnNames, 0);
         authorTable = new JTable(authorTableModel);
         JScrollPane authorScrollPane = new JScrollPane(authorTable);
@@ -58,26 +61,28 @@ public class AuthorPanel extends JPanel {
         add(authorScrollPane, BorderLayout.CENTER);
 
         // Add Author Action
-        addAuthorButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                addAuthor();
-            }
-        });
+        addAuthorButton.addActionListener(e -> addAuthor());
 
         // Update Author Action
-        updateAuthorButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updateAuthor();
-            }
-        });
+        updateAuthorButton.addActionListener(e -> updateAuthor());
 
         // Delete Author Action
-        deleteAuthorButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                deleteAuthor();
+        deleteAuthorButton.addActionListener(e -> deleteAuthor());
+
+        // Set up row selection listener
+        authorTable.getSelectionModel().addListSelectionListener(e -> {
+            int selectedRow = authorTable.getSelectedRow();
+
+            if (selectedRow != -1) {
+
+                selectedAuthorId  = (String) authorTable.getValueAt(selectedRow, 0);
+                String authorName = (String) authorTable.getValueAt(selectedRow, 1);
+                String nationality = (String) authorTable.getValueAt(selectedRow, 2);
+                int birthYear = (int) authorTable.getValueAt(selectedRow, 3);
+
+                authorNameField.setText(authorName);
+                nationalityField.setText(nationality);
+                birthYearField.setText(String.valueOf(birthYear));
             }
         });
 
@@ -92,7 +97,7 @@ public class AuthorPanel extends JPanel {
         List<Author> authors = authorAction.getAllAuthors();
 
         for (Author author : authors) {
-            Object[] data = {author.getName(), author.getNationality(), author.getBirthYear()};
+            Object[] data = {author.getId().toString(),author.getName(), author.getNationality(), author.getBirthYear()};
             authorTableModel.addRow(data);
         }
     }
@@ -101,6 +106,7 @@ public class AuthorPanel extends JPanel {
         authorNameField.setText("");
         nationalityField.setText("");
         birthYearField.setText("");
+        selectedAuthorId=null;
     }
 
     private void addAuthor() {
@@ -116,7 +122,6 @@ public class AuthorPanel extends JPanel {
                 author.setName(name);
                 author.setNationality(nationality);
                 author.setBirthYear(birthYear);
-                System.out.println(author);
 
                 authorAction.createAuthor(author);
                 updateAuthorTable();
@@ -125,7 +130,6 @@ public class AuthorPanel extends JPanel {
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(AuthorPanel.this, "Invalid Birth Year. Please enter a valid number.");
             }
-
         } else {
             JOptionPane.showMessageDialog(AuthorPanel.this, "Please fill in all author fields.");
         }
@@ -147,6 +151,8 @@ public class AuthorPanel extends JPanel {
                     updatedAuthor.setName(authorName);
                     updatedAuthor.setNationality(nationality);
                     updatedAuthor.setBirthYear(birthYear);
+                    updatedAuthor.setId(new ObjectId(selectedAuthorId));
+                    System.out.println(updatedAuthor.getId());
 
                     authorAction.updateAuthor(updatedAuthor);
                     updateAuthorTable();
@@ -155,7 +161,6 @@ public class AuthorPanel extends JPanel {
                 } catch (NumberFormatException ex) {
                     JOptionPane.showMessageDialog(AuthorPanel.this, "Invalid Birth Year. Please enter a valid number.");
                 }
-
             } else {
                 JOptionPane.showMessageDialog(AuthorPanel.this, "Please fill in all author fields.");
             }
@@ -173,7 +178,7 @@ public class AuthorPanel extends JPanel {
                     "Are you sure you want to delete the author: " + authorName + "?", "Confirmation", JOptionPane.YES_NO_OPTION);
 
             if (option == JOptionPane.YES_OPTION) {
-                authorAction.deleteAuthor(authorName);
+                authorAction.deleteAuthor(selectedAuthorId);
                 updateAuthorTable();
                 clearAuthorFields();
             }

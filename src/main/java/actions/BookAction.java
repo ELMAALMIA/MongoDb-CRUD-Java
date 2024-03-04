@@ -10,8 +10,8 @@ import java.util.List;
 public class BookAction {
     private final BookDao bookDao;
 
-    public BookAction(MongoDatabase database) {
-        this.bookDao = new BookDefault(database);
+    public BookAction() {
+        this.bookDao = new BookDefault();
     }
 
     public void createBook(Book book) {

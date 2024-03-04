@@ -1,7 +1,9 @@
 package DAO;
 
+import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import config.MongoDbConfig;
 import models.Book;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -14,8 +16,11 @@ import static com.mongodb.client.model.Filters.eq;
 public class BookDefault implements  BookDao{
     private MongoCollection<Document> collection;
     private  Document document;
-
-    public BookDefault(MongoDatabase database) {
+private  MongoDatabase database;
+private   MongoClient mongoClient;
+    public BookDefault() {
+         mongoClient = MongoDbConfig.createMongoClient();
+       database = MongoDbConfig.getDatabase();
         this.collection = database.getCollection("books");
     }
 

@@ -1,10 +1,14 @@
 package DAO;
 
+import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import config.MongoDbConfig;
 import models.Author;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+
+
 import static com.mongodb.client.model.Filters.eq;
 
 
@@ -14,20 +18,18 @@ import java.util.Vector;
 
 public class AuthorDefault implements AuthorDao{
     private MongoCollection<Document> collection;
+    private  MongoDatabase mongoDatabase;
 
-    public AuthorDefault(MongoDatabase database) {
-
-        if (database.getCollection("authors") == null) {
-            System.out.println("Creating 'authors' collection...");
-            database.createCollection("authors");
-            System.out.println("'authors' collection created.");
-        }
-        this.collection = database.getCollection("authors");
-
+    public AuthorDefault() {
+        MongoClient mongoClient = MongoDbConfig.createMongoClient();
+        this.mongoDatabase = MongoDbConfig.getDatabase();
+        this.collection = mongoDatabase.getCollection("authors");
     }
+    // le reste du code
 
     @Override
     public void create(Author author) {
+
         Document document = new Document("name", author.getName())
                 .append("nationality", author.getNationality())
                 .append("birthYear", author.getBirthYear());
@@ -38,16 +40,10 @@ public class AuthorDefault implements AuthorDao{
             }
             document.append("bookIds", bookIds);
         }
-        //insertOne(doc) ne modifie pas doc pour inclure l'_id généré.
 
-        collection.insertOne(document);
-        author.setId(document.getObjectId("_id"));
-    }
+     mongoDatabase.getCollection("authors").insertOne(document);
 
-    @Override
-    public Author findById(String id) {
-        Document doc = collection.find(eq("_id", new ObjectId(id))).first();
-        return documentToAuthor(doc);
+
     }
 
     @Override
@@ -62,10 +58,15 @@ public class AuthorDefault implements AuthorDao{
     }
 
     @Override
+    public Author findById(String id) {
+        Document document = collection.find(eq("_id", new ObjectId(id))).first();
+        return documentToAuthor(document);
+    }
+    @Override
     public List<Author> findAuthorsByNationality(String nationality) {
         List<Author> authors = new Vector<>();
-        for (Document doc : collection.find(eq("nationality", nationality))) {
-            authors.add(documentToAuthor(doc));
+        for (Document document : collection.find(eq("nationality", nationality))) {
+            authors.add(documentToAuthor(document));
         }
         return authors;
     }
@@ -80,6 +81,7 @@ public class AuthorDefault implements AuthorDao{
 
     @Override
     public void delete(String id) {
+        System.out.println("id : "+id);
         collection.deleteOne(eq("_id", new ObjectId(id)));
     }
 
@@ -89,7 +91,6 @@ public class AuthorDefault implements AuthorDao{
         author.setName(doc.getString("name"));
         author.setNationality(doc.getString("nationality"));
         author.setBirthYear(doc.getInteger("birthYear", 0));
-        // Convertir les String bookIds en ObjectId
         List<ObjectId> bookIds = new Vector<>();
         List<String> books = doc.getList("bookIds", String.class);
         if (books != null) {

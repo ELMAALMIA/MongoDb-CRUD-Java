@@ -8,6 +8,7 @@ import DAO.BookDefault;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
+import config.MongoDbConfig;
 import models.Author;
 import models.Book;
 
@@ -35,14 +36,13 @@ public class LibraryUi extends JFrame {
     private final AuthorPanel authorPanel;
     private final BookPanel bookPanel;
 
-    private final MongoClient mongoClient;
-    private final MongoDatabase database;
 
-    public LibraryUi(AuthorAction authorAction, BookAction bookAction, MongoClient mongoClient, MongoDatabase database) {
+
+
+    public LibraryUi(AuthorAction authorAction, BookAction bookAction) {
         this.authorAction = authorAction;
         this.bookAction = bookAction;
-        this.mongoClient = mongoClient;
-        this.database = database;
+
 
         setTitle("Library Management - MongoDB");
         setSize(600, 400);
@@ -62,35 +62,24 @@ public class LibraryUi extends JFrame {
         setVisible(true);
 
         // Add a window listener to close the MongoClient when the window is closed
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                closeMongoClient();
-            }
-        });
+//        addWindowListener(new WindowAdapter() {
+//            @Override
+//            public void windowClosing(WindowEvent e) {
+//                closeMongoClient();
+//            }
+//        });
     }
 
-    private void closeMongoClient() {
-        if (mongoClient != null ) {
-            mongoClient.close();
-        }
-    }
 
     public static void main(String[] args) {
-        try (MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017")) {
-            // Select a database
-            MongoDatabase database = mongoClient.getDatabase("myDb");
-
-            // Set up Author and Book actions
-            AuthorAction authorAction = new AuthorAction(database);
-            BookAction bookAction = new BookAction(database);
-
-            // Create and display the Swing application
-
-                    new LibraryUi(authorAction, bookAction, mongoClient, database);
-
+        try {
+            AuthorAction authorAction = new AuthorAction();
+            BookAction bookAction = new BookAction();
+            new LibraryUi(authorAction, bookAction);
         } catch (Exception e) {
+            // Handle the exception appropriately (e.g., log or show an error message)
             e.printStackTrace();
         }
     }
+
 }

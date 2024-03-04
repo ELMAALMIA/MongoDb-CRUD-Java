@@ -11,8 +11,10 @@ public class Author {
     private List<ObjectId> bookIds; // Références aux livres
 
     public Author() {}
+   
+// Getters and Setters
 
-    // Getters et Setters
+
     public ObjectId getId() {
         return id;
     }

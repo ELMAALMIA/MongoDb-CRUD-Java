@@ -22,19 +22,14 @@ public class MongoDBExample {
             MongoCollection<Document> collection = database.getCollection("myCollection");
             MongoCollection<Document> collectionAuthors = database.getCollection("authors");
 
-           AuthorDefault authorDefault = new AuthorDefault(database);
+           AuthorDefault authorDefault = new AuthorDefault();
             Author author = new Author();
-            author.setName("Author test ");
+            author.setName("Author test 2 ");
             author.setNationality("British");
             author.setBirthYear(2000);
             authorDefault.create(author);
-            // Créer un document à insérer
-            Document doc = new Document("nom", "EL MAALMI")
-                    .append("age", 22)
-                    .append("profession", "Développeur");
 
-            // Insérer le document dans la collection
-            collection.insertOne(doc);
+
         }
     }
 }

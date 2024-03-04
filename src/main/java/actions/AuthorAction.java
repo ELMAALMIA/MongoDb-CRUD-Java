@@ -10,9 +10,9 @@ import java.util.List;
 public class AuthorAction {
 
     private AuthorDefault authorDao;
-
-    public AuthorAction(MongoDatabase database) {
-        this.authorDao = new AuthorDefault(database);
+    
+    public AuthorAction() {
+        this.authorDao = new AuthorDefault();
     }
     public  void createAuthor(Author author){
         authorDao.create(author);
@@ -28,8 +28,8 @@ public class AuthorAction {
         authorDao.update(author);
     }
 
-
     public  void  deleteAuthor(String id){
         authorDao.delete(id);
     }
+
 }

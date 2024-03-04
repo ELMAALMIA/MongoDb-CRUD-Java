@@ -1,14 +1,19 @@
-package DAO;
+package tests;
 
-import com.mongodb.client.MongoDatabase;
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
+
 import config.MongoDbConnection;
 import models.Author;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.AfterEach;
+import com.mongodb.client.MongoDatabase;
 
 import static org.junit.jupiter.api.Assertions.*;
-class AuthorDefaultTest {
 
+class AuthorDefaultTest {
     private MongoDatabase database;
     private AuthorDefault authorDao;
 
@@ -18,7 +23,7 @@ class AuthorDefaultTest {
         // Assurez-vous que la collection est vide avant chaque test
         database.getCollection("authors").drop();
 
-        authorDao = new AuthorDefault();
+        authorDao = new AuthorDefault(database);
         Author author = new Author();
         author.setName("Author test ");
         author.setNationality("British");
