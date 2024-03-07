@@ -36,9 +36,6 @@ public class LibraryUi extends JFrame {
     private final AuthorPanel authorPanel;
     private final BookPanel bookPanel;
 
-
-
-
     public LibraryUi(AuthorAction authorAction, BookAction bookAction) {
         this.authorAction = authorAction;
         this.bookAction = bookAction;

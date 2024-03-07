@@ -53,6 +53,7 @@ public class AuthorPanel extends JPanel {
         // Author Table
         String[] authorColumnNames = {"ID","Name", "Nationality", "Birth Year"};
         DefaultTableModel authorTableModel = new DefaultTableModel(authorColumnNames, 0);
+        
         authorTable = new JTable(authorTableModel);
         JScrollPane authorScrollPane = new JScrollPane(authorTable);
 

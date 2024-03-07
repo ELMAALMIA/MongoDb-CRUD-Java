@@ -7,10 +7,15 @@ public class MongoDbConnection {
     private static final String CONNECTION_URL = "mongodb://localhost:27017";
     private static final String DATABASE_NAME = "myDb";
 
+    private static MongoDatabase databaseInstance;
+
+    private MongoDbConnection() {} 
+
     public static MongoDatabase getDatabase() {
-        System.out.println("CONNECTION TO MONGODB........");
-        MongoClient mongoClient = MongoClients.create(CONNECTION_URL);
-        return mongoClient.getDatabase(DATABASE_NAME);
+        if (databaseInstance == null) {
+            MongoClient mongoClient = MongoClients.create(CONNECTION_URL);
+            databaseInstance = mongoClient.getDatabase(DATABASE_NAME);
+        }
+        return databaseInstance;
     }
 }
-

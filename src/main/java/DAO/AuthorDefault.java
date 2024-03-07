@@ -1,32 +1,29 @@
 package DAO;
 
-import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import config.MongoDbConfig;
+import config.MongoDbConnection;
 import models.Author;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
 
 import static com.mongodb.client.model.Filters.eq;
-
-
-
 import java.util.List;
 import java.util.Vector;
 
 public class AuthorDefault implements AuthorDao{
     private MongoCollection<Document> collection;
     private  MongoDatabase mongoDatabase;
+   
 
     public AuthorDefault() {
-        MongoClient mongoClient = MongoDbConfig.createMongoClient();
-        this.mongoDatabase = MongoDbConfig.getDatabase();
+        this.mongoDatabase = MongoDbConnection.getDatabase();
         this.collection = mongoDatabase.getCollection("authors");
     }
+    
     // le reste du code
-
+    
     @Override
     public void create(Author author) {
 
@@ -41,9 +38,8 @@ public class AuthorDefault implements AuthorDao{
             document.append("bookIds", bookIds);
         }
 
-     mongoDatabase.getCollection("authors").insertOne(document);
-
-
+     collection.insertOne(document);
+        author.setId(document.getObjectId("_id"));
     }
 
     @Override
@@ -86,6 +82,9 @@ public class AuthorDefault implements AuthorDao{
     }
 
     private Author documentToAuthor(Document doc) {
+        if (doc == null) {
+            return null;
+        }
         Author author = new Author();
         author.setId(doc.getObjectId("_id"));
         author.setName(doc.getString("name"));
